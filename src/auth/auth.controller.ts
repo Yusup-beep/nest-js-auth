@@ -1,9 +1,18 @@
 import { UserEntity } from '@/user/entities/user.entity'
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	Post,
+	Req,
+	UnauthorizedException,
+	UseGuards
+} from '@nestjs/common'
 import { UserService } from '../user/user.service'
 import { LoginDto } from './dto/login.dto'
 import { RefreshRequest } from './dto/refresh-token.dto'
 import { RegisterDto } from './dto/register.dto'
+import { JWTGuard } from './guards/jwt.guard'
 import { TokenService } from './token.service'
 
 export interface AuthenticationPayload {
@@ -79,6 +88,19 @@ export class AuthController {
 		return {
 			status: 'success',
 			data: payload
+		}
+	}
+
+	@Get('/me')
+	@UseGuards(JWTGuard)
+	public async getUser(@Req() request) {
+		const userId = request.user.id
+
+		const user = await this.users.findById(userId)
+
+		return {
+			status: 'success',
+			data: user
 		}
 	}
 
