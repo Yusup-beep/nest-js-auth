@@ -8,6 +8,7 @@ import {
 	UnauthorizedException,
 	UseGuards
 } from '@nestjs/common'
+import { Request } from 'express'
 import { UserService } from '../user/user.service'
 import { LoginDto } from './dto/login.dto'
 import { RefreshRequest } from './dto/refresh-token.dto'
@@ -34,12 +35,13 @@ export class AuthController {
 		this.tokens = tokens
 	}
 	@Post('/register')
-	public async register(@Body() body: RegisterDto) {
+	public async register(@Body() body: RegisterDto, @Req() req: Request) {
 		const user = await this.users.createUser(body)
 		const token = await this.tokens.generateAccessToken(user)
 		const refresh = await this.tokens.generateRefreshToken(
 			user,
-			60 * 60 * 24 * 30
+			60 * 60 * 24 * 30,
+			req
 		)
 
 		const payload = this.buildResponsePayload(user, token, refresh)
@@ -51,7 +53,7 @@ export class AuthController {
 	}
 
 	@Post('/login')
-	public async login(@Body() body: LoginDto) {
+	public async login(@Body() body: LoginDto, @Req() req: Request) {
 		const { email, password } = body
 
 		const user = await this.users.findByEmail(email)
@@ -66,7 +68,8 @@ export class AuthController {
 		const token = await this.tokens.generateAccessToken(user)
 		const refresh = await this.tokens.generateRefreshToken(
 			user,
-			60 * 60 * 24 * 30
+			60 * 60 * 24 * 30,
+			req
 		)
 
 		const payload = this.buildResponsePayload(user, token, refresh)

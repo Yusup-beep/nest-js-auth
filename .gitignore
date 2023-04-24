@@ -34,7 +34,9 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-/src/category
-/src/utils
 .env
 yarn.lock
+
+/src/category
+/src/tag
+/src/utils

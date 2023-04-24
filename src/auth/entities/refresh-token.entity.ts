@@ -9,6 +9,9 @@ export class RefreshTokenEntity {
 	user_id: number
 
 	@Column()
+	ip_address: string
+
+	@Column()
 	is_revoked: boolean
 
 	@Column()

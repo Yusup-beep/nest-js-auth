@@ -1,6 +1,7 @@
 import { UserEntity } from '@/user/entities/user.entity'
 import { Injectable, UnprocessableEntityException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { Request } from 'express'
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken'
 import { UserRepository } from '../user/user.repository'
 import { RefreshTokenEntity } from './entities/refresh-token.entity'
@@ -41,9 +42,10 @@ export class TokenService {
 
 	public async generateRefreshToken(
 		user: UserEntity,
-		expiresIn: number
+		expiresIn: number,
+		req: Request
 	): Promise<string> {
-		const token = await this.tokens.createRefreshToken(user, expiresIn)
+		const token = await this.tokens.createRefreshToken(user, expiresIn, req)
 
 		const opts: SignOptions = {
 			...BASE_OPTIONS,
