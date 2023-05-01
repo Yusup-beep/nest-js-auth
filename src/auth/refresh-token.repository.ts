@@ -24,6 +24,8 @@ export class RefreshTokensRepository {
 		token.user_id = user.id
 		token.is_revoked = false
 		token.ip_address = this.getIp(req)
+		token.browser = this.getBrowserInfo(req)
+		token.country = this.getCountry(req)
 		const expiration = new Date()
 		expiration.setTime(expiration.getTime() + ttl)
 
@@ -38,6 +40,18 @@ export class RefreshTokensRepository {
 		})
 	}
 	getIp(req: Request): string {
-		return getClientIp(req)
+		const raw_ip = getClientIp(req)
+		if (raw_ip.startsWith('::ffff:')) {
+			return raw_ip.substr(7)
+		}
+		return raw_ip
+	}
+
+	getBrowserInfo(req: Request): string {
+		return req.header['user-agent'] || 'XX'
+	}
+
+	getCountry(req: Request): string {
+		return req.header['cf-ipcountry'] ? req.header['cf-ipcountry'] : 'XX'
 	}
 }

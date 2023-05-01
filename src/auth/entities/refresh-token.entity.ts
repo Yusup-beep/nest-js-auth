@@ -12,6 +12,12 @@ export class RefreshTokenEntity {
 	ip_address: string
 
 	@Column()
+	country: string
+
+	@Column()
+	browser: string
+
+	@Column()
 	is_revoked: boolean
 
 	@Column()
