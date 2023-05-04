@@ -1,5 +1,6 @@
 import { UserEntity } from '@/user/entities/user.entity'
 import { UserService } from '@/user/user.service'
+import { MailerService } from '@nestjs-modules/mailer'
 import {
 	HttpException,
 	HttpStatus,
@@ -7,6 +8,7 @@ import {
 	Req,
 	UnauthorizedException
 } from '@nestjs/common'
+
 import { LoginDto } from './dto/login.dto'
 import { RefreshRequest } from './dto/refresh-token.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -25,10 +27,15 @@ export interface AuthenticationPayload {
 export class AuthService {
 	private readonly users: UserService
 	private readonly tokens: TokenService
-
-	public constructor(users: UserService, tokens: TokenService) {
+	private readonly mailer: MailerService
+	public constructor(
+		users: UserService,
+		tokens: TokenService,
+		mailer: MailerService
+	) {
 		this.users = users
 		this.tokens = tokens
+		this.mailer = mailer
 	}
 
 	async register(dto: RegisterDto, @Req() req) {
@@ -39,6 +46,8 @@ export class AuthService {
 		}
 		const user = await this.users.createUser(dto)
 		const token = await this.tokens.generateAccessToken(user)
+		const fullActivationLink = `${process.env.SERVER_HOST}/api/auth/activate/${token}`
+		await this.sendActivationLinkOnEmail(fullActivationLink, user.email)
 		const refresh = await this.tokens.generateRefreshToken(
 			user,
 			60 * 60 * 24 * 30,
@@ -117,5 +126,20 @@ export class AuthService {
 				...(refreshToken ? { refresh_token: refreshToken } : {})
 			}
 		}
+	}
+
+	async sendActivationLinkOnEmail(fullActivationLink, email) {
+		await this.mailer.sendMail({
+			to: email,
+			from: process.env.SMTP_USER,
+			subject: `Confirmation your email on ${process.env.SERVER_HOST}`,
+			text: '',
+			html: `
+		        <div>
+		          <h1>Hello! Follow the link to activate your account on ${process.env.SERVER_HOST}!</h1>
+		          <a href="${fullActivationLink}">${fullActivationLink}</a>
+		        </div>
+		      `
+		})
 	}
 }
