@@ -6,11 +6,7 @@ import {
 	UpdateDateColumn
 } from 'typeorm'
 
-enum UserStatus {
-	ACTIVE = 'active',
-	BLOCKED = 'blocked',
-	PENDING = 'pending'
-}
+import { UserRoles, UserStatus } from '@/auth/enums/user.enums'
 
 @Entity('users')
 export class UserEntity {
@@ -29,6 +25,13 @@ export class UserEntity {
 		default: UserStatus.PENDING
 	})
 	status: UserStatus
+
+	@Column({
+		type: 'enum',
+		enum: UserRoles,
+		default: UserRoles.USER
+	})
+	role: string
 
 	@CreateDateColumn()
 	created_at: Date

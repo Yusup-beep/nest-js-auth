@@ -46,7 +46,7 @@ export class AuthService {
 		}
 		const user = await this.users.createUser(dto)
 		const token = await this.tokens.generateAccessToken(user)
-		const fullActivationLink = `${process.env.SERVER_HOST}/api/auth/activate/${token}`
+		const fullActivationLink = `${process.env.SERVER_HOST}/api/auth/activate?token=${token}`
 		await this.sendActivationLinkOnEmail(fullActivationLink, user.email)
 		const refresh = await this.tokens.generateRefreshToken(
 			user,

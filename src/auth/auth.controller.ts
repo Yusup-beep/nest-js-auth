@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
 import { AuthService } from './auth.service'
+import { Roles } from './decorators/roles.decorator'
+import { UserRoles } from './enums/user.enums'
 import { JWTGuard } from './guards/jwt.guard'
+import { RolesGuard } from './guards/roles.guard'
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +17,15 @@ export class AuthController {
 	@Post('/register')
 	public async register(@Body() body, @Req() req: Request) {
 		return this.auth.register(body, req)
+	}
+
+	@Get('/private')
+	@Roles(UserRoles.USER)
+	@UseGuards(JWTGuard, RolesGuard)
+	public async private() {
+		return {
+			success: true
+		}
 	}
 
 	@Post('/login')
