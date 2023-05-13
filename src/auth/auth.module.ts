@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { RefreshTokenEntity } from './entities/refresh-token.entity'
+import { JWTGuard } from './guards/jwt.guard'
+import { RolesGuard } from './guards/roles.guard'
 import { RefreshTokensRepository } from './refresh-token.repository'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { TokenService } from './token.service'
@@ -23,6 +25,13 @@ import { TokenService } from './token.service'
 		UserModule
 	],
 	controllers: [AuthController],
-	providers: [AuthService, TokenService, RefreshTokensRepository, JwtStrategy]
+	providers: [
+		AuthService,
+		TokenService,
+		RefreshTokensRepository,
+		JwtStrategy,
+		JWTGuard,
+		RolesGuard
+	]
 })
 export class AuthModule {}
