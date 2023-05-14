@@ -1,3 +1,4 @@
+import { UserEntity } from '@/user/entities/user.entity'
 import { UserModule } from '@/user/user.module'
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
@@ -14,7 +15,7 @@ import { TokenService } from './token.service'
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([RefreshTokenEntity]),
+		TypeOrmModule.forFeature([RefreshTokenEntity, UserEntity]),
 		JwtModule.register({
 			secret: '<SECRET KEY>',
 			signOptions: {

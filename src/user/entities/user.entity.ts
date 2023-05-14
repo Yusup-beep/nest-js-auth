@@ -31,7 +31,7 @@ export class UserEntity {
 		enum: UserRoles,
 		default: UserRoles.USER
 	})
-	role: string
+	role: UserRoles
 
 	@CreateDateColumn()
 	created_at: Date

@@ -9,6 +9,9 @@ import {
 	UnauthorizedException
 } from '@nestjs/common'
 
+import { JwtService } from '@nestjs/jwt'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 import { LoginDto } from './dto/login.dto'
 import { RefreshRequest } from './dto/refresh-token.dto'
 import { RegisterDto } from './dto/register.dto'
@@ -28,7 +31,10 @@ export class AuthService {
 	private readonly users: UserService
 	private readonly tokens: TokenService
 	private readonly mailer: MailerService
+	private readonly jwtService: JwtService
 	public constructor(
+		@InjectRepository(UserEntity)
+		private userRepository: Repository<UserEntity>,
 		users: UserService,
 		tokens: TokenService,
 		mailer: MailerService
@@ -59,6 +65,22 @@ export class AuthService {
 		return {
 			status: 'success',
 			data: payload
+		}
+	}
+
+	async activate(token: string) {
+		const data = this.jwtService.verify(token)
+		const user = await this.users.findById(data.id)
+		if (!user) {
+			throw new UnauthorizedException(
+				`User with activation link "${token}" was not found!`
+			)
+		}
+		user.status === 'active'
+		await this.userRepository.save(user)
+		return {
+			success: true,
+			message: `Account with email "${user.email}" has been activated!`
 		}
 	}
 

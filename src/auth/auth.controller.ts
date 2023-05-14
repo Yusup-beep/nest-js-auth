@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Req,
+	UseGuards
+} from '@nestjs/common'
 import { Request } from 'express'
 import { AuthService } from './auth.service'
 import { Roles } from './decorators/role.decorator'
@@ -21,6 +29,11 @@ export class AuthController {
 	@Post('/login')
 	public async login(@Body() body, @Req() req: Request) {
 		return this.auth.login(body, req)
+	}
+
+	@Get('/activate/:token')
+	activate(@Param('token') token: string) {
+		return this.auth.activate(token)
 	}
 
 	@Post('/refresh')
